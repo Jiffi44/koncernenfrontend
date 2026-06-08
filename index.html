@@ -21,38 +21,38 @@
             <i class="bi bi-list"></i>
         </button>
 
-<nav class="top-nav" id="top-nav">
+        <nav class="top-nav" id="top-nav">
 
-    <div class="nav-links">
-        <a href="#hero">Hem</a>
-        <a href="#cars-section">Bilar</a>
-        <a href="#booking-section">Mina bokningar</a>
-        <a href="#about-section">Om oss</a>
-        <a href="#contact-section">Kontakt</a>
-        <a href="#admin-section" id="admin-nav-link" class="hidden">Admin</a>
-    </div>
-    </nav>
+            <div class="nav-links">
+                <a href="#hero">Hem</a>
+                <a href="#cars-section">Bilar</a>
+                <a href="#booking-section">Mina bokningar</a>
+                <a href="#about-section">Om oss</a>
+                <a href="#contact-section">Kontakt</a>
+                <a href="#admin-section" id="admin-nav-link" class="hidden">Admin</a>
+            </div>
+        </nav>
 
-    <div class="header-buttons">
+        <div class="header-buttons">
 
-        <div id="login-form">
-            <input type="text" id="username" placeholder="Användarnamn">
-            <input type="password" id="password" placeholder="Lösenord">
+            <div id="login-form">
+                <input type="text" id="username" placeholder="Användarnamn">
+                <input type="password" id="password" placeholder="Lösenord">
 
-            <button class="btn login-btn" onclick="login()">
-                Logga in
-            </button>
+                <button class="btn login-btn" onclick="login()">
+                    Logga in
+                </button>
+            </div>
+
+            <div id="user-info" class="hidden">
+                <span id="logged-user"></span>
+
+                <button class="btn standard-btn logout-btn" onclick="logout()">
+                    Logga ut
+                </button>
+            </div>
+
         </div>
-
-        <div id="user-info" class="hidden">
-            <span id="logged-user"></span>
-
-            <button class="btn standard-btn logout-btn" onclick="logout()">
-                Logga ut
-            </button>
-        </div>
-
-    </div>
 
 
 
@@ -88,8 +88,7 @@
                 <select id="typeFilter" onchange="filterCars()">
                     <option value="Alla">Alla</option>
                     <option value="Sport">Sport</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Sedan">Sedan</option>
+                    <option value="El">El</option>
                 </select>
 
                 <div class="sort-buttons">
