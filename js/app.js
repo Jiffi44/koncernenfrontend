@@ -1,13 +1,20 @@
 console.log("app.js fungerar");
 
+/* GLOBALA VARIABLER */
+
+const API_URL = "http://localhost:8080/api/v1";
+
 let allCars = [];
+let allUsers = [];
+let userSortAsc = true;
+
+/* BILAR */
 
 async function getCars() {
-    const response = await fetch("http://localhost:8080/api/v1/cars");
+    const response = await fetch(`${API_URL}/cars`);
     const cars = await response.json();
 
     allCars = cars;
-
     displayCars(allCars);
 }
 
@@ -17,20 +24,25 @@ function displayCars(cars) {
 
     cars.forEach(car => {
         container.innerHTML += `
-            <div class="car-card panel neutral-panel">
-                <h2>${car.name}</h2>
-                <p>Modell: ${car.model}</p>
-                <p>Typ: ${car.type}</p>
-                <p>Pris: ${car.price} kr/dag</p>
+            <div class="car-row panel neutral-panel">
+                <img src="images/${car.id}.png" alt="${car.name}" class="car-row-image">
 
-                <input type="date" id="from-${car.id}">
-                <input type="date" id="to-${car.id}">
-<button class="btn standard-btn" onclick="bookCar(${car.id})">Boka</button>
-                
+                <div class="car-row-info">
+                    <strong>${car.name}</strong>
+                    <span>Modell: ${car.model}</span>
+                    <span>Typ: ${car.type}</span>
+                    <span>Pris: ${car.price} kr/dag</span>
+                </div>
+
+                <button class="btn standard-btn" onclick="showBookingForm(${car.id}, this)">
+                    Välj bil
+                </button>
             </div>
         `;
     });
 }
+
+/* SORTERING OCH FILTRERING */
 
 function sortByName() {
     allCars.sort((a, b) => a.name.localeCompare(b.name));
@@ -48,27 +60,24 @@ function sortByPrice() {
 }
 
 function filterCars() {
+    const selectedType = document.getElementById("typeFilter").value;
 
-    const selectedType =
-        document.getElementById("typeFilter").value;
-
-    if(selectedType === "Alla"){
+    if (selectedType === "Alla") {
         displayCars(allCars);
         return;
     }
 
-    const filteredCars = allCars.filter(
-        car => car.type === selectedType
-    );
-
+    const filteredCars = allCars.filter(car => car.type === selectedType);
     displayCars(filteredCars);
 }
+
+/* LOGIN OCH LOGOUT */
 
 async function login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    const response = await fetch("http://localhost:8080/api/v1/auth/login", {
+    const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -79,42 +88,89 @@ async function login() {
         })
     });
 
-const data = await response.json();
+    if (response.ok) {
+        const data = await response.json();
 
-if (response.ok) {
+        sessionStorage.setItem("username", username);
+        sessionStorage.setItem("password", password);
+        sessionStorage.setItem("user", JSON.stringify(data));
 
-    sessionStorage.setItem("username", username);
-    sessionStorage.setItem("password", password);
-    sessionStorage.setItem("user", JSON.stringify(data));
+        showLoggedInUser(data);
+    } else {
+        alert("Fel användarnamn eller lösenord");
+    }
+}
 
-    document.getElementById("login-form")
-        .classList.add("hidden");
+function showLoggedInUser(user) {
+    document.getElementById("login-form").classList.add("hidden");
+    document.getElementById("user-info").classList.remove("hidden");
 
-    document.getElementById("user-info")
-        .classList.remove("hidden");
+    document.getElementById("logged-user").textContent =
+        `Inloggad som: ${user.username}`;
 
-    document.getElementById("logged-user")
-        .textContent = `Inloggad som: ${data.username}`;
+    if (user.isAdmin) {
+        document.getElementById("admin-section").classList.remove("hidden");
+        document.getElementById("admin-nav-link").classList.remove("hidden");
+    }
+}
 
-    if (data.isAdmin) {
-        document.getElementById("admin-section")
-            .classList.remove("hidden");
+function logout() {
+    sessionStorage.clear();
+
+    document.getElementById("login-form").classList.remove("hidden");
+    document.getElementById("user-info").classList.add("hidden");
+
+    document.getElementById("admin-section").classList.add("hidden");
+    document.getElementById("admin-nav-link").classList.add("hidden");
+}
+
+/* BOKNINGAR */
+
+function showBookingForm(carId, button) {
+    const bookingBox = document.getElementById(`booking-form-${carId}`);
+
+    if (bookingBox) {
+        bookingBox.remove();
+        return;
     }
 
-} else {
+    const carRow = button.closest(".car-row");
 
-    alert("Fel användarnamn eller lösenord");
+    carRow.insertAdjacentHTML("afterend", `
+        <div id="booking-form-${carId}" class="booking-form panel neutral-panel">
+            <h3>Beställning</h3>
 
+            <label for="from-${carId}">Från datum</label>
+            <input type="date" id="from-${carId}">
+
+            <label for="to-${carId}">Till datum</label>
+            <input type="date" id="to-${carId}">
+
+            <button class="btn positive-btn" onclick="bookCar(${carId})">
+                Bekräfta bokning
+            </button>
+        </div>
+    `);
 }
-}
+
 async function bookCar(carId) {
     const username = sessionStorage.getItem("username");
     const password = sessionStorage.getItem("password");
 
+    if (!username || !password) {
+        alert("Du måste logga in först.");
+        return;
+    }
+
     const fromDate = document.getElementById(`from-${carId}`).value;
     const toDate = document.getElementById(`to-${carId}`).value;
 
-    const response = await fetch("http://localhost:8080/api/v1/bookings", {
+    if (!fromDate || !toDate) {
+        alert("Välj både från-datum och till-datum.");
+        return;
+    }
+
+    const response = await fetch(`${API_URL}/bookings`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -128,21 +184,23 @@ async function bookCar(carId) {
         })
     });
 
-if (response.ok) {
-    alert("Bokning skapad!");
-} else {
-    const errorText = await response.text();
-    console.log("Status:", response.status);
-    console.log("Fel:", errorText);
-    alert("Bokningen misslyckades. Status: " + response.status);
-}
+    if (response.ok) {
+        alert("Bokning skapad!");
+    } else {
+        alert("Bokningen misslyckades. Status: " + response.status);
+    }
 }
 
 async function getMyBookings() {
     const username = sessionStorage.getItem("username");
     const password = sessionStorage.getItem("password");
 
-    const response = await fetch("http://localhost:8080/api/v1/bookings/me", {
+    if (!username || !password) {
+        alert("Du måste logga in först.");
+        return;
+    }
+
+    const response = await fetch(`${API_URL}/bookings/me`, {
         headers: {
             "Authorization": "Basic " + btoa(username + ":" + password)
         }
@@ -169,22 +227,25 @@ async function getMyBookings() {
         container.innerHTML = "<p>Inga bokningar hittades.</p>";
     }
 }
-let allUsers = [];
-let userSortAsc = true;
+
+/* ADMIN */
 
 async function getAllUsers() {
-
     const username = sessionStorage.getItem("username");
     const password = sessionStorage.getItem("password");
 
-    const response = await fetch("http://localhost:8080/api/v1/users", {
+    const response = await fetch(`${API_URL}/users`, {
         headers: {
             "Authorization": "Basic " + btoa(username + ":" + password)
         }
     });
 
-    allUsers = await response.json();
-    displayUsers(allUsers);
+    if (response.ok) {
+        allUsers = await response.json();
+        displayUsers(allUsers);
+    } else {
+        alert("Du har inte behörighet att visa användare.");
+    }
 }
 
 function displayUsers(users) {
@@ -209,30 +270,21 @@ function sortUsersBy(column) {
         const valueA = String(a[column]).toLowerCase();
         const valueB = String(b[column]).toLowerCase();
 
-        if (userSortAsc) {
-            return valueA.localeCompare(valueB);
-        } else {
-            return valueB.localeCompare(valueA);
-        }
+        return userSortAsc
+            ? valueA.localeCompare(valueB)
+            : valueB.localeCompare(valueA);
     });
 
     userSortAsc = !userSortAsc;
     displayUsers(allUsers);
 }
 
-function logout() {
+/* MOBILMENY */
 
-    sessionStorage.clear();
-
-    document.getElementById("login-form")
-        .classList.remove("hidden");
-
-    document.getElementById("user-info")
-        .classList.add("hidden");
-
-    document.getElementById("admin-section")
-        .classList.add("hidden");
-
+function toggleMenu() {
+    document.getElementById("top-nav").classList.toggle("active");
 }
+
+/* START */
 
 getCars();

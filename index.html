@@ -17,38 +17,52 @@
 
         <img src="images/koncernLogga.png" alt="Wigellkoncernens logga" class="logo">
 
-        <nav class="top-nav">
-            <a href="#cars-section">Bilar</a>
-            <a href="#booking-section">Mina bokningar</a>
-            <a href="#admin-section">Admin</a>
-        </nav>
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="bi bi-list"></i>
+        </button>
 
-        <div class="header-buttons">
+<nav class="top-nav" id="top-nav">
 
-            <div id="login-form">
-                <input type="text" id="username" placeholder="Användarnamn">
-                <input type="password" id="password" placeholder="Lösenord">
+    <div class="nav-links">
+        <a href="#hero">Hem</a>
+        <a href="#cars-section">Bilar</a>
+        <a href="#booking-section">Mina bokningar</a>
+        <a href="#about-section">Om oss</a>
+        <a href="#contact-section">Kontakt</a>
+        <a href="#admin-section" id="admin-nav-link" class="hidden">Admin</a>
+    </div>
+    </nav>
 
-                <button class="btn login-btn" onclick="login()">
-                    Logga in
-                </button>
-            </div>
+    <div class="header-buttons">
 
-            <div id="user-info" class="hidden">
-                <span id="logged-user"></span>
+        <div id="login-form">
+            <input type="text" id="username" placeholder="Användarnamn">
+            <input type="password" id="password" placeholder="Lösenord">
 
-                <button class="btn standard-btn logout-btn" onclick="logout()">
-                    Logga ut
-                </button>
-            </div>
-
+            <button class="btn login-btn" onclick="login()">
+                Logga in
+            </button>
         </div>
+
+        <div id="user-info" class="hidden">
+            <span id="logged-user"></span>
+
+            <button class="btn standard-btn logout-btn" onclick="logout()">
+                Logga ut
+            </button>
+        </div>
+
+    </div>
+
+
+
+
 
     </header>
 
     <main>
 
-        <section class="hero">
+        <section id="hero" class="hero">
             <h1>Wigell Car Rental</h1>
             <p>Hyr bil enkelt, tryggt och snabbt hos Wigellkoncernen.</p>
 
@@ -106,6 +120,39 @@
             </div>
         </section>
 
+        <section id="about-section" class="info-section">
+            <h2>Om oss</h2>
+
+            <p>
+                Wigell Car Rental erbjuder moderna och pålitliga hyrbilar för alla behov. Oavsett om du söker en
+                sportbil för en speciell upplevelse,
+                en bekväm familjebil för semestern eller en rymlig minibuss för större sällskap har vi ett fordon som
+                passar dig. Vårt mål är att göra
+                biluthyrning enkel, trygg och flexibel med hög kvalitet och god service.
+
+            </p>
+        </section>
+
+        <section id="contact-section" class="info-section">
+            <h2>Kontakt</h2>
+
+            <div class="panel neutral-panel contact-card">
+
+                <h3>
+                    <i class="bi bi-person-badge-fill"></i>
+                    VD
+                </h3>
+
+                <p>
+                    <i class="bi bi-envelope-fill"></i>
+                    <a href="mailto:tomas.wigell@wigellkoncernen.se">
+                        tomas.wigell@wigellkoncernen.se
+                    </a>
+                </p>
+
+            </div>
+        </section>
+
         <section id="admin-section" class="admin-section hidden">
             <h2>Admin</h2>
 
@@ -113,7 +160,7 @@
                 Här kan du se alla användare.
             </p>
 
-            <div class="panel negative-panel">
+            <div class="panel standard-panel">
 
                 <button class="btn function-btn" onclick="getAllUsers()">
                     <i class="bi bi-people-fill"></i>
