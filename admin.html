@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Wigell Car Rental</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+
+<body class="admin-page">
+
+    <header class="top-header">
+        <img src="images/koncernLogga.png" alt="Wigellkoncernens logga" class="logo">
+
+        <div class="header-buttons">
+            <button class="btn negative-btn" onclick="logout()">Logga ut</button>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+
+        <nav class="admin-sidebar">
+            <h2>Admin</h2>
+
+            <ul class="admin-menu">
+                <li><a href="index.html"><i class="bi bi-house"></i> Startsida</a></li>
+                <li><a href="#" onclick="getAllUsers()"><i class="bi bi-people"></i> Visa användare</a></li>
+                <li><a href="#" onclick="getAllBookings()"><i class="bi bi-calendar-check"></i> Visa bokningar</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-main">
+
+            <section class="admin-hero">
+                <h1>Administrationspanel</h1>
+                <p>Här kan administratören hantera användare och bokningar.</p>
+            </section>
+
+            <section>
+                <h2>Användare</h2>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Användarnamn</th>
+                                <th>Förnamn</th>
+                                <th>Efternamn</th>
+                                <th>E-post</th>
+                                <th>Roll</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-container"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>Bokningar</h2>
+
+                <div class="panel neutral-panel admin-search-box">
+                    <label for="booking-id-search">Sök boknings-ID</label>
+                    <input type="number" id="booking-id-search" placeholder="Ex. 12">
+
+                    <label for="booking-id-search">Boknings-ID</label>
+                    <input type="number" id="booking-id-search" placeholder="Sök boknings-ID">
+
+                    <button class="btn standard-btn" onclick="searchBookings()">
+                        Sök
+                    </button>
+
+                    <button class="btn function-btn" onclick="getAllBookings()">
+                        Visa alla bokningar
+                    </button>
+                </div>
+
+                <div id="all-bookings-container"></div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        const user = JSON.parse(sessionStorage.getItem("user"));
+
+        if (!user || !user.isAdmin) {
+            alert("Du saknar behörighet.");
+            window.location.href = "index.html";
+        }
+
+        getAllUsers();
+
+        getCars();
+        getAllUsers();
+        getAllBookings();
+
+    </script>
+
+</body>
+
+</html>

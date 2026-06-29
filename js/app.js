@@ -34,9 +34,12 @@ function displayCars(cars) {
                     <span>Pris: ${car.price} kr/dag</span>
                 </div>
 
-                <button class="btn standard-btn" onclick="showBookingForm(${car.id}, this)">
-                    Välj bil
-                </button>
+                ${car.booked
+                ? `<button class="btn negative-btn" disabled>Redan bokad</button>`
+                : `<button class="btn standard-btn" onclick="showBookingForm(${car.id}, this)">
+                            Välj bil
+                       </button>`
+            }
             </div>
         `;
     });
@@ -109,19 +112,13 @@ function showLoggedInUser(user) {
         `Inloggad som: ${user.username}`;
 
     if (user.isAdmin) {
-        document.getElementById("admin-section").classList.remove("hidden");
         document.getElementById("admin-nav-link").classList.remove("hidden");
     }
 }
 
 function logout() {
     sessionStorage.clear();
-
-    document.getElementById("login-form").classList.remove("hidden");
-    document.getElementById("user-info").classList.add("hidden");
-
-    document.getElementById("admin-section").classList.add("hidden");
-    document.getElementById("admin-nav-link").classList.add("hidden");
+    window.location.href = "index.html";
 }
 
 /* BOKNINGAR */
@@ -186,6 +183,8 @@ async function bookCar(carId) {
 
     if (response.ok) {
         alert("Bokning skapad!");
+        getCars(); // Hämtar bilarna igen så att bokad-status uppdateras
+
     } else {
         alert("Bokningen misslyckades. Status: " + response.status);
     }
@@ -195,12 +194,7 @@ async function getMyBookings() {
     const username = sessionStorage.getItem("username");
     const password = sessionStorage.getItem("password");
 
-    if (!username || !password) {
-        alert("Du måste logga in först.");
-        return;
-    }
-
-    const response = await fetch(`${API_URL}/bookings/me`, {
+    const response = await fetch("http://localhost:8080/api/v1/bookings/me", {
         headers: {
             "Authorization": "Basic " + btoa(username + ":" + password)
         }
@@ -213,18 +207,58 @@ async function getMyBookings() {
         const bookings = await response.json();
 
         bookings.forEach(booking => {
+
+            const car = allCars.find(c => c.id === booking.carId);
+
             container.innerHTML += `
-                <div class="booking-card">
-                    <p>Bokning ID: ${booking.id}</p>
-                    <p>Bil ID: ${booking.carId}</p>
-                    <p>Från: ${booking.fromDate}</p>
-                    <p>Till: ${booking.toDate}</p>
-                    <p>Aktiv: ${booking.active}</p>
+                <div class="booking-card panel neutral-panel">
+                    <h3>${car ? car.name : "Okänd bil"}</h3>
+                    <p><strong>Modell:</strong> ${car ? car.model : "-"}</p>
+                    <p><strong>Typ:</strong> ${car ? car.type : "-"}</p>
+                    <p><strong>Från:</strong> ${booking.fromDate}</p>
+                    <p><strong>Till:</strong> ${booking.toDate}</p>
+                    <p><strong>Status:</strong> ${booking.active ? "Aktiv bokning" : "Avslutad"}</p>
+
+                    ${booking.active
+                    ? `<button class="btn negative-btn"
+         onclick="returnCar(${booking.id})">
+            Avsluta bokning
+       </button>`
+                    : `<p>Avslutad</p>`
+                }
+
                 </div>
             `;
         });
+
     } else {
-        container.innerHTML = "<p>Inga bokningar hittades.</p>";
+        container.innerHTML = "<p>Du har inga bokningar.</p>";
+    }
+
+
+}
+
+async function returnCar(id) {
+
+    const username = sessionStorage.getItem("username");
+    const password = sessionStorage.getItem("password");
+
+    const response = await fetch(
+        `http://localhost:8080/api/v1/bookings/return/${id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Authorization": "Basic " + btoa(username + ":" + password)
+            }
+        }
+    );
+
+    if (response.ok) {
+        alert("Bokningen avslutades.");
+        getMyBookings();
+        getCars();
+    } else {
+        alert("Kunde inte avsluta bokningen.");
     }
 }
 
@@ -287,4 +321,119 @@ function toggleMenu() {
 
 /* START */
 
-getCars();
+if (document.getElementById("car-container")) {
+    getCars();
+}
+
+const storedUser = JSON.parse(sessionStorage.getItem("user"));
+
+if (storedUser && storedUser.isAdmin) {
+    const adminLink = document.getElementById("admin-nav-link");
+
+    if (adminLink) {
+        adminLink.classList.remove("hidden");
+    }
+}
+let allBookings = [];
+
+async function getAllBookings() {
+    const username = sessionStorage.getItem("username");
+    const password = sessionStorage.getItem("password");
+
+    const response = await fetch(`${API_URL}/bookings`, {
+        headers: {
+            "Authorization": "Basic " + btoa(username + ":" + password)
+        }
+    });
+
+    const container = document.getElementById("all-bookings-container");
+    container.innerHTML = "";
+
+    if (response.ok) {
+        allBookings = await response.json();
+        displayAllBookings(allBookings);
+    } else {
+        container.innerHTML = "<p>Du har inte behörighet att visa bokningar.</p>";
+    }
+}
+
+function displayAllBookings(bookings) {
+    const container = document.getElementById("all-bookings-container");
+    container.innerHTML = "";
+
+    if (bookings.length === 0) {
+        container.innerHTML = "<p>Inga bokningar hittades.</p>";
+        return;
+    }
+
+    bookings.forEach(booking => {
+        const car = allCars.find(c => c.id === booking.carId);
+
+        container.innerHTML += `
+            <div class="booking-card panel neutral-panel">
+                <h3>Bokning #${booking.id}</h3>
+
+                <p><strong>Bil:</strong> ${car ? car.name : "Bil ID " + booking.carId}</p>
+                <p><strong>Modell:</strong> ${car ? car.model : "-"}</p>
+                <p><strong>Användare ID:</strong> ${booking.userId}</p>
+                <p><strong>Från:</strong> ${booking.fromDate}</p>
+                <p><strong>Till:</strong> ${booking.toDate}</p>
+                <p><strong>Status:</strong> ${booking.active ? "Aktiv bokning" : "Avslutad"}</p>
+
+                ${booking.active
+                    ? `<button class="btn negative-btn" onclick="returnCarAdmin(${booking.id})">
+                            Avsluta bokning
+                       </button>`
+                    : `<p>Bokningen är avslutad.</p>`
+                }
+            </div>
+        `;
+    });
+}
+
+function searchBookings() {
+
+    const bookingId =
+        document.getElementById("booking-id-search").value;
+
+    const bookingDate =
+        document.getElementById("booking-date-search").value;
+
+    let filteredBookings = allBookings;
+
+    if (bookingId !== "") {
+        filteredBookings = filteredBookings.filter(
+            booking => booking.id == bookingId
+        );
+    }
+
+    if (bookingDate !== "") {
+        filteredBookings = filteredBookings.filter(
+            booking =>
+                booking.fromDate <= bookingDate &&
+                booking.toDate >= bookingDate
+        );
+    }
+
+    displayAllBookings(filteredBookings);
+}
+
+async function returnCarAdmin(id) {
+    const username = sessionStorage.getItem("username");
+    const password = sessionStorage.getItem("password");
+
+    const response = await fetch(`${API_URL}/bookings/return/${id}`, {
+        method: "PUT",
+        headers: {
+            "Authorization": "Basic " + btoa(username + ":" + password)
+        }
+    });
+
+    if (response.ok) {
+        alert("Bokningen avslutades.");
+        getAllBookings();
+        getCars();
+    } else {
+        alert("Kunde inte avsluta bokningen.");
+    }
+}

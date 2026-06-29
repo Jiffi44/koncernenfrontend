@@ -1,0 +1,64 @@
+/* ADMIN-SIDA */
+
+.admin-page{
+    background-color: #000000;
+}
+
+.admin-layout{
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 90px);
+}
+
+.admin-sidebar{
+    background-color: #94a2b2;
+    padding: 2rem;
+    border-right: 1px solid #2a3753;
+}
+
+.admin-sidebar h2{
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.admin-sidebar ul{
+    list-style: none;
+}
+
+.admin-sidebar li{
+    margin-bottom: 1.5rem;
+}
+
+.admin-sidebar a{
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+.admin-main{
+    padding: 4rem;
+}
+
+.admin-main .panel{
+    margin-bottom: 2rem;
+}
+
+.admin-main h1{
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px){
+    .admin-layout{
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar{
+        border-right: none;
+        border-bottom: 1px solid #2a3753;
+    }
+
+    .admin-main{
+        padding: 2rem;
+    }
+}
