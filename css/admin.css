@@ -1,9 +1,3 @@
-/* ADMIN-SIDA */
-
-.admin-page{
-    background-color: #000000;
-}
-
 .admin-layout{
     display: grid;
     grid-template-columns: 260px 1fr;
@@ -16,39 +10,12 @@
     border-right: 1px solid #2a3753;
 }
 
-.admin-sidebar h2{
-    font-size: 2rem;
-    margin-bottom: 2rem;
-}
-
-.admin-sidebar ul{
-    list-style: none;
-}
-
-.admin-sidebar li{
-    margin-bottom: 1.5rem;
-}
-
-.admin-sidebar a{
-    color: white;
-    text-decoration: none;
-    font-size: 1.1rem;
-}
-
 .admin-main{
     padding: 4rem;
 }
 
-.admin-main .panel{
-    margin-bottom: 2rem;
-}
+@media (max-width:768px){
 
-.admin-main h1{
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-@media (max-width: 768px){
     .admin-layout{
         grid-template-columns: 1fr;
     }
@@ -61,4 +28,47 @@
     .admin-main{
         padding: 2rem;
     }
+}
+.admin-main{
+    padding: 4rem 10%;
+}
+
+.admin-hero{
+    min-height: 300px;
+    border-radius: 1rem;
+    padding: 4rem;
+
+    background:
+        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+        url("../images/background.jpg");
+
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 3rem;
+}
+
+.admin-hero h1{
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.admin-search-box{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.admin-search-box input{
+    padding: 1rem;
+    border: 2px solid #2a3753;
+    border-radius: 0.7rem;
+    background-color: #2a3753;
+    color: white;
+}
+
+#all-bookings-container{
+    display: grid;
+    gap: 1rem;
 }

@@ -15,88 +15,127 @@
 <body class="admin-page">
 
     <header class="top-header">
+
         <img src="images/koncernLogga.png" alt="Wigellkoncernens logga" class="logo">
 
-        <div class="header-buttons">
-            <button class="btn negative-btn" onclick="logout()">Logga ut</button>
-        </div>
-    </header>
+        <nav class="top-nav">
 
-    <div class="admin-layout">
+            <div class="nav-links">
 
-        <nav class="admin-sidebar">
-            <h2>Admin</h2>
+                <a href="index.html">Startsida</a>
 
-            <ul class="admin-menu">
-                <li><a href="index.html"><i class="bi bi-house"></i> Startsida</a></li>
-                <li><a href="#" onclick="getAllUsers()"><i class="bi bi-people"></i> Visa användare</a></li>
-                <li><a href="#" onclick="getAllBookings()"><i class="bi bi-calendar-check"></i> Visa bokningar</a></li>
-            </ul>
+                <a href="#users-section">Användare</a>
+
+                <a href="#bookings-section">Bokningar</a>
+
+            </div>
+
         </nav>
 
-        <main class="admin-main">
+        <div class="header-buttons">
 
-            <section class="admin-hero">
-                <h1>Administrationspanel</h1>
-                <p>Här kan administratören hantera användare och bokningar.</p>
-            </section>
+            <button class="btn negative-btn" onclick="logout()">
+                Logga ut
+            </button>
 
-            <section>
-                <h2>Användare</h2>
+        </div>
 
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Användarnamn</th>
-                                <th>Förnamn</th>
-                                <th>Efternamn</th>
-                                <th>E-post</th>
-                                <th>Roll</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-container"></tbody>
-                    </table>
-                </div>
-            </section>
+    </header>
 
-            <section>
-                <h2>Bokningar</h2>
+    <main class="admin-main">
 
-                <div class="panel neutral-panel admin-search-box">
-                    <label for="booking-id-search">Sök boknings-ID</label>
-                    <input type="number" id="booking-id-search" placeholder="Ex. 12">
+        <section class="admin-hero">
+            <h1>Administrationspanel</h1>
+            <p>Här kan administratören hantera användare och bokningar.</p>
+        </section>
 
-                    <label for="booking-id-search">Boknings-ID</label>
-                    <input type="number" id="booking-id-search" placeholder="Sök boknings-ID">
+        <section id="users-section">
+            <h2>Användare</h2>
 
-                    <button class="btn standard-btn" onclick="searchBookings()">
-                        Sök
-                    </button>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                <button class="table-sort-btn" onclick="sortUsersBy('id')">
+                                    ID
+                                </button>
+                            </th>
 
-                    <button class="btn function-btn" onclick="getAllBookings()">
-                        Visa alla bokningar
-                    </button>
-                </div>
+                            <th>
+                                <button class="table-sort-btn" onclick="sortUsersBy('username')">
+                                    Användarnamn
+                                </button>
+                            </th>
 
-                <div id="all-bookings-container"></div>
-            </section>
+                            <th>
+                                <button class="table-sort-btn" onclick="sortUsersBy('firstName')">
+                                    Förnamn
+                                </button>
+                            </th>
 
-        </main>
+                            <th>
+                                <button class="table-sort-btn" onclick="sortUsersBy('lastName')">
+                                    Efternamn
+                                </button>
+                            </th>
 
-    </div>
+                            <th>
+                                <button class="table-sort-btn" onclick="sortUsersBy('email')">
+                                    E-post
+                                </button>
+                            </th>
 
-    <script src="js/app.js"></script>
+                            <th>
+                                <button class="table-sort-btn" onclick="sortUsersBy('role')">
+                                    Roll
+                                </button>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-container"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="bookings-section">
+            <h2>Bokningar</h2>
+
+            <div class="panel neutral-panel admin-search-box">
+
+
+                <label for="booking-id-search">Boknings-ID</label>
+
+                <input type="text" id="booking-id-search" placeholder="Sök boknings-ID">
+
+                <button class="btn standard-btn" onclick="searchBookings()">
+                    Sök
+                </button>
+
+                <button class="btn function-btn" onclick="getAllBookings()">
+                    Visa alla bokningar
+                </button>
+
+            </div>
+
+            <div id="all-bookings-container"></div>
+        </section>
+
+    </main>
 
     <script>
         const user = JSON.parse(sessionStorage.getItem("user"));
 
         if (!user || !user.isAdmin) {
-            alert("Du saknar behörighet.");
-            window.location.href = "index.html";
+            window.location.replace("index.html");
         }
+    </script>
 
-        getAllUsers();
+
+    <script src="js/app.js"></script>
+
+    <script>
 
         getCars();
         getAllUsers();

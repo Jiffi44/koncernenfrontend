@@ -30,8 +30,7 @@
                 <a href="#about-section">Om oss</a>
                 <a href="#contact-section">Kontakt</a>
                 <a href="admin.html" id="admin-nav-link" class="hidden">Admin</a>
-                    
-                </a>
+
             </div>
         </nav>
 
@@ -44,6 +43,12 @@
                 <button class="btn login-btn" onclick="login()">
                     Logga in
                 </button>
+                <p class="register-link">
+                    Ny kund?
+                    <a href="#" onclick="toggleRegisterForm()">
+                        Skapa konto
+                    </a>
+                </p>
             </div>
 
             <div id="user-info" class="hidden">
@@ -57,7 +62,37 @@
         </div>
 
 
+        <div id="register-form" class="hidden">
 
+            <div class="register-header">
+
+                <h3>Skapa konto</h3>
+
+                <button type="button" class="close-register" onclick="toggleRegisterForm()">
+
+                    <i class="bi bi-x-lg"></i>
+
+                </button>
+
+            </div>
+
+            <input type="text" id="reg-firstname" placeholder="Förnamn">
+
+            <input type="text" id="reg-lastname" placeholder="Efternamn">
+
+            <input type="email" id="reg-email" placeholder="E-post">
+
+            <input type="text" id="reg-phone" placeholder="Telefon">
+
+            <input type="text" id="reg-username" placeholder="Användarnamn">
+
+            <input type="password" id="reg-password" placeholder="Lösenord">
+
+            <button class="btn positive-btn" onclick="registerUser()">
+                Skapa konto
+            </button>
+
+        </div>
 
 
     </header>
@@ -150,63 +185,6 @@
                         tomas.wigell@wigellkoncernen.se
                     </a>
                 </p>
-
-            </div>
-        </section>
-
-        <section id="admin-section" class="admin-section hidden">
-            <h2>Admin</h2>
-
-            <p>
-                Här kan du se alla användare.
-            </p>
-
-            <div class="panel standard-panel">
-
-                <button class="btn function-btn" onclick="getAllUsers()">
-                    <i class="bi bi-people-fill"></i>
-                    Visa alla användare
-                </button>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>
-                                    <button class="table-sort-btn" onclick="sortUsersBy('username')">
-                                        Användarnamn
-                                    </button>
-                                </th>
-                                <th>
-                                    <button class="table-sort-btn" onclick="sortUsersBy('firstName')">
-                                        Förnamn
-                                    </button>
-                                </th>
-                                <th>
-                                    <button class="table-sort-btn" onclick="sortUsersBy('lastName')">
-                                        Efternamn
-                                    </button>
-                                </th>
-                                <th>
-                                    <button class="table-sort-btn" onclick="sortUsersBy('email')">
-                                        E-post
-                                    </button>
-                                </th>
-                                <th>
-                                    <button class="table-sort-btn" onclick="sortUsersBy('role')">
-                                        Roll
-                                    </button>
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="admin-container">
-                            <tr>
-                                <td colspan="5">Inga användare hämtade ännu.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
 
             </div>
         </section>

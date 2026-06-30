@@ -6,6 +6,7 @@ const API_URL = "http://localhost:8080/api/v1";
 
 let allCars = [];
 let allUsers = [];
+let allBookings = [];
 let userSortAsc = true;
 
 /* BILAR */
@@ -15,9 +16,13 @@ async function getCars() {
     const cars = await response.json();
 
     allCars = cars;
-    displayCars(allCars);
-}
 
+    const carContainer = document.getElementById("car-container");
+
+    if (carContainer) {
+        displayCars(allCars);
+    }
+}
 function displayCars(cars) {
     const container = document.getElementById("car-container");
     container.innerHTML = "";
@@ -217,14 +222,10 @@ async function getMyBookings() {
                     <p><strong>Typ:</strong> ${car ? car.type : "-"}</p>
                     <p><strong>Från:</strong> ${booking.fromDate}</p>
                     <p><strong>Till:</strong> ${booking.toDate}</p>
-                    <p><strong>Status:</strong> ${booking.active ? "Aktiv bokning" : "Avslutad"}</p>
-
+        
                     ${booking.active
-                    ? `<button class="btn negative-btn"
-         onclick="returnCar(${booking.id})">
-            Avsluta bokning
-       </button>`
-                    : `<p>Avslutad</p>`
+                    ? `<p><strong>Status:</strong> Väntar på återlämning</p>`
+                    : `<p>Bokningen är avslutad.</p>`
                 }
 
                 </div>
@@ -288,14 +289,15 @@ function displayUsers(users) {
 
     users.forEach(user => {
         container.innerHTML += `
-            <tr>
-                <td>${user.username}</td>
-                <td>${user.firstName}</td>
-                <td>${user.lastName}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
-            </tr>
-        `;
+    <tr>
+        <td>${user.id}</td>
+        <td>${user.username}</td>
+        <td>${user.firstName}</td>
+        <td>${user.lastName}</td>
+        <td>${user.email}</td>
+        <td>${user.role}</td>
+    </tr>
+`;
     });
 }
 
@@ -327,6 +329,10 @@ if (document.getElementById("car-container")) {
 
 const storedUser = JSON.parse(sessionStorage.getItem("user"));
 
+if (storedUser) {
+    showLoggedInUser(storedUser);
+}
+
 if (storedUser && storedUser.isAdmin) {
     const adminLink = document.getElementById("admin-nav-link");
 
@@ -334,7 +340,6 @@ if (storedUser && storedUser.isAdmin) {
         adminLink.classList.remove("hidden");
     }
 }
-let allBookings = [];
 
 async function getAllBookings() {
     const username = sessionStorage.getItem("username");
@@ -346,11 +351,14 @@ async function getAllBookings() {
         }
     });
 
+    console.log("Alla bokningar status:", response.status);
+
     const container = document.getElementById("all-bookings-container");
     container.innerHTML = "";
 
     if (response.ok) {
         allBookings = await response.json();
+        console.log(allBookings);
         displayAllBookings(allBookings);
     } else {
         container.innerHTML = "<p>Du har inte behörighet att visa bokningar.</p>";
@@ -381,39 +389,27 @@ function displayAllBookings(bookings) {
                 <p><strong>Status:</strong> ${booking.active ? "Aktiv bokning" : "Avslutad"}</p>
 
                 ${booking.active
-                    ? `<button class="btn negative-btn" onclick="returnCarAdmin(${booking.id})">
+                ? `<button class="btn negative-btn" onclick="returnCarAdmin(${booking.id})">
                             Avsluta bokning
                        </button>`
-                    : `<p>Bokningen är avslutad.</p>`
-                }
+                : `<p>Bokningen är avslutad.</p>`
+            }
             </div>
         `;
     });
 }
 
 function searchBookings() {
+    const bookingId = document.getElementById("booking-id-search").value;
 
-    const bookingId =
-        document.getElementById("booking-id-search").value;
-
-    const bookingDate =
-        document.getElementById("booking-date-search").value;
-
-    let filteredBookings = allBookings;
-
-    if (bookingId !== "") {
-        filteredBookings = filteredBookings.filter(
-            booking => booking.id == bookingId
-        );
+    if (bookingId === "") {
+        alert("Skriv in ett boknings-ID.");
+        return;
     }
 
-    if (bookingDate !== "") {
-        filteredBookings = filteredBookings.filter(
-            booking =>
-                booking.fromDate <= bookingDate &&
-                booking.toDate >= bookingDate
-        );
-    }
+    const filteredBookings = allBookings.filter(
+        booking => booking.id == bookingId
+    );
 
     displayAllBookings(filteredBookings);
 }
@@ -435,5 +431,37 @@ async function returnCarAdmin(id) {
         getCars();
     } else {
         alert("Kunde inte avsluta bokningen.");
+    }
+}
+
+function toggleRegisterForm() {
+
+    document
+        .getElementById("register-form")
+        .classList.toggle("hidden");
+
+}
+async function registerUser() {
+    const response = await fetch(`${API_URL}/users`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            firstName: document.getElementById("reg-firstname").value,
+            lastName: document.getElementById("reg-lastname").value,
+            email: document.getElementById("reg-email").value,
+            phone: document.getElementById("reg-phone").value,
+            username: document.getElementById("reg-username").value,
+            password: document.getElementById("reg-password").value,
+            role: "ROLE_USER"
+        })
+    });
+
+    if (response.ok) {
+        alert("Kontot skapades! Du kan nu logga in.");
+        toggleRegisterForm();
+    } else {
+        alert("Kunde inte skapa konto. Kontrollera att användarnamn eller e-post inte redan används.");
     }
 }
